@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Monuments of War: Ancient Empires</title>
+    <!-- Carga del motor Phaser 3 (Gratis desde CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #000; overflow: hidden; }
+        #game { width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+
+<div id="game"></div>
+
+<script>
+const config = {
+    type: Phaser.AUTO,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    parent: 'game',
+    backgroundColor: '#111b2b',
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
+
+const game = new Phaser.Game(config);
+
+function preload() {}
+
+function create() {
+    // Título Principal
+    this.add.text(window.innerWidth / 2, 40, 'MONUMENTS OF WAR', {
+        fontSize: '26px',
+        fill: '#ffd700',
+        fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    this.add.text(window.innerWidth / 2, 75, 'Ancient Empires - Servidor Activo', {
+        fontSize: '15px',
+        fill: '#ffffff'
+    }).setOrigin(0.5);
+
+    // Dibuja textura del pasto isométrico
+    let g = this.make.graphics({x: 0, y: 0, add: false});
+    g.fillStyle(0x2e8b57, 1);
+    g.beginPath();
+    g.moveTo(64, 0);
+    g.lineTo(128, 32);
+    g.lineTo(64, 64);
+    g.lineTo(0, 32);
+    g.closePath();
+    g.fillPath();
+    g.lineStyle(2, 0x185a37, 1);
+    g.strokePath();
+    g.generateTexture('pasto', 128, 64);
+
+    let centroX = window.innerWidth / 2;
+    let centroY = window.innerHeight / 2 - 20;
+
+    // Mapa isométrico base (5x5)
+    for (let f = 0; f < 5; f++) {
+        for (let c = 0; c < 5; c++) {
+            let isoX = centroX + (c - f) * 64;
+            let isoY = centroY + (c + f) * 32;
+            this.add.image(isoX, isoY, 'pasto');
+        }
+    }
+
+    // Control de arrastre de cámara táctil
+    this.input.on('pointermove', (pointer) => {
+        if (pointer.isDown) {
+            this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x);
+            this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y);
+        }
+    });
+}
+
+function update() {}
+
+window.addEventListener('resize', () => {
+    game.scale.resize(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body>
+</html>
+
