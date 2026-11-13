@@ -1,0 +1,63 @@
+name: Deploy · GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Permisos mínimos para publicar en Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un despliegue a la vez, sin cancelar el que ya está publicando
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Empaquetar sitio estático
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verificar archivos del juego
+        run: |
+          set -e
+          for f in index.html css/style.css js/main.js js/game.js js/terrain.js js/units.js js/monuments.js js/ui.js js/config.js; do
+            test -f "$f" || { echo "Falta $f"; exit 1; }
+          done
+          echo "Estructura del proyecto verificada."
+
+      - name: Preparar artefacto (_site)
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -r css js _site/
+          cp README.md _site/ 2>/dev/null || true
+          # evita que Pages procese el sitio con Jekyll
+          touch _site/.nojekyll
+          du -sh _site
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir artefacto
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Publicar en GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

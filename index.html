@@ -1,93 +1,160 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Monuments of War: Ancient Empires</title>
-    <!-- Carga del motor Phaser 3 (Gratis desde CDN) -->
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
-    <style>
-        body { margin: 0; padding: 0; background-color: #000; overflow: hidden; }
-        #game { width: 100vw; height: 100vh; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monuments of War · Ancient Empires — RTS 3D Low-Poly</title>
+<meta name="description" content="Prototipo jugable de RTS 3D low-poly: Incas y Mayas, Sacsayhuamán, el Willaq Umu y las pirámides mayas. 100% en el navegador con Three.js.">
+<meta name="theme-color" content="#05070d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2305070d'/%3E%3Cpath d='M12 46 L24 20 L32 34 L40 14 L52 46 Z' fill='none' stroke='%237fd8ff' stroke-width='4' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<div id="app" class="intro-mode">
 
-<div id="game"></div>
+  <div id="viewport">
+    <canvas id="scene"></canvas>
+    <div id="vignette"></div>
 
-<script>
-const config = {
-    type: Phaser.AUTO,
-    width: window.innerWidth,
-    height: window.innerHeight,
-    parent: 'game',
-    backgroundColor: '#111b2b',
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
-};
+    <header id="topbar">
+      <div class="brand">
+        <span class="sigil" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M4 25 L11 8 L16 18 L21 6 L28 25 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </span>
+        <div class="brand-txt">
+          <h1>MONUMENTS OF WAR</h1>
+          <p>Ancient Empires · Prototipo RTS 3D</p>
+        </div>
+      </div>
 
-const game = new Phaser.Game(config);
+      <div class="res-group">
+        <div class="res" title="Oro — lo generan las terrazas agrícolas">
+          <span class="ico oro"></span>
+          <span class="val" id="res-oro">0</span>
+          <label>Oro</label>
+        </div>
+        <div class="res" title="Inti — fe solar del Coricancha">
+          <span class="ico inti"></span>
+          <span class="val" id="res-inti">0</span>
+          <label>Inti</label>
+        </div>
+        <div class="res" title="Población de tu hueste">
+          <span class="ico pop"></span>
+          <span class="val" id="res-pop">0/20</span>
+          <label>Hueste</label>
+        </div>
+      </div>
 
-function preload() {}
+      <div class="top-actions">
+        <div id="wave-chip" class="chip"><span class="dot"></span><span id="wave-info">Oleada 1</span></div>
+        <button class="btn ghost" id="btn-lore" type="button">Lore</button>
+        <button class="btn ghost" id="btn-help" type="button">Cómo jugar</button>
+        <a class="btn donate" id="btn-donate" href="#" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.7-9.3-9.1C1.2 8.2 3.4 4.8 6.9 4.8c2 0 3.5 1.1 4.3 2.3.8-1.2 2.3-2.3 4.3-2.3 3.5 0 5.7 3.4 4.2 7.1C19.5 16.3 12 21 12 21z" fill="currentColor"/></svg>
+          Apoyar el desarrollo
+        </a>
+      </div>
+    </header>
 
-function create() {
-    // Título Principal
-    this.add.text(window.innerWidth / 2, 40, 'MONUMENTS OF WAR', {
-        fontSize: '26px',
-        fill: '#ffd700',
-        fontStyle: 'bold'
-    }).setOrigin(0.5);
+    <section id="sel-panel" class="panel hidden" aria-live="polite">
+      <div class="sel-head">
+        <div class="portrait" id="sel-portrait"></div>
+        <div class="sel-meta">
+          <h3 id="sel-name">—</h3>
+          <p id="sel-kind">—</p>
+          <div class="hpbar"><i id="sel-hp-fill"></i></div>
+          <span class="hpnum" id="sel-hp">0 / 0</span>
+        </div>
+      </div>
+      <div class="sel-actions" id="sel-actions"></div>
+    </section>
 
-    this.add.text(window.innerWidth / 2, 75, 'Ancient Empires - Servidor Activo', {
-        fontSize: '15px',
-        fill: '#ffffff'
-    }).setOrigin(0.5);
+    <aside id="right-col">
+      <div class="panel mini">
+        <div class="panel-title">Mapa estratégico</div>
+        <canvas id="minimap" width="230" height="230"></canvas>
+      </div>
+      <div class="panel log">
+        <div class="panel-title">Crónica de guerra</div>
+        <ul id="log-list"></ul>
+      </div>
+    </aside>
 
-    // Dibuja textura del pasto isométrico
-    let g = this.make.graphics({x: 0, y: 0, add: false});
-    g.fillStyle(0x2e8b57, 1);
-    g.beginPath();
-    g.moveTo(64, 0);
-    g.lineTo(128, 32);
-    g.lineTo(64, 64);
-    g.lineTo(0, 32);
-    g.closePath();
-    g.fillPath();
-    g.lineStyle(2, 0x185a37, 1);
-    g.strokePath();
-    g.generateTexture('pasto', 128, 64);
+    <div id="objective" class="panel">
+      <div class="panel-title">Objetivo</div>
+      <p id="objective-txt">Destruye la <b>Pirámide de Kukulcán</b> y conserva el Coricancha.</p>
+    </div>
 
-    let centroX = window.innerWidth / 2;
-    let centroY = window.innerHeight / 2 - 20;
+    <footer id="hints">
+      <span><kbd>Clic izq.</kbd> seleccionar</span>
+      <span><kbd>Arrastrar</kbd> caja</span>
+      <span><kbd>Clic der.</kbd> mover / atacar</span>
+      <span><kbd>WASD</kbd> cámara</span>
+      <span><kbd>Rueda</kbd> zoom</span>
+      <span><kbd>Q</kbd><kbd>E</kbd> rotar</span>
+      <span><kbd>Esc</kbd> cancelar</span>
+    </footer>
 
-    // Mapa isométrico base (5x5)
-    for (let f = 0; f < 5; f++) {
-        for (let c = 0; c < 5; c++) {
-            let isoX = centroX + (c - f) * 64;
-            let isoY = centroY + (c + f) * 32;
-            this.add.image(isoX, isoY, 'pasto');
-        }
-    }
+    <div id="toast" class="hidden"></div>
+    <div id="errbox" class="hidden"></div>
+  </div>
 
-    // Control de arrastre de cámara táctil
-    this.input.on('pointermove', (pointer) => {
-        if (pointer.isDown) {
-            this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x);
-            this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y);
-        }
-    });
+  <div id="modal" class="hidden" role="dialog" aria-modal="true" aria-label="Información del juego">
+    <div class="modal-card">
+      <button class="modal-x" id="modal-x" type="button" aria-label="Cerrar">×</button>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="intro">
+    <div class="intro-inner">
+      <div class="intro-kicker">PROTOTIPO JUGABLE · THREE.JS · 100% CLIENT-SIDE</div>
+      <h2>MONUMENTS<span>OF WAR</span></h2>
+      <p class="intro-sub">Dos imperios se miran desde el altiplano. La piedra recuerda quién la talló.</p>
+      <div class="factions">
+        <div class="fcard inca">
+          <h4>Incas <em>· Tú</em></h4>
+          <p>Piedra encajada sin mortero, terrazas de altura y la palabra del <b>Willaq Umu</b>.</p>
+        </div>
+        <div class="fcard maya">
+          <h4>Mayas <em>· IA</em></h4>
+          <p>Escalinatas infinitas, jaguares y el cálculo del cielo sobre la piedra caliza.</p>
+        </div>
+      </div>
+      <button class="btn primary big" id="btn-start" type="button">Iniciar campaña</button>
+      <p class="intro-foot">Sin servidores · sin anuncios · sin afiliados</p>
+    </div>
+  </div>
+
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
 }
-
-function update() {}
-
-window.addEventListener('resize', () => {
-    game.scale.resize(window.innerWidth, window.innerHeight);
-});
 </script>
-
+<script type="module" src="js/main.js"></script>
+<script>
+  // Red de seguridad: si algo falla, lo mostramos en pantalla en vez de dejar un canvas negro.
+  window.addEventListener('error', function (e) {
+    var box = document.getElementById('errbox');
+    if (!box) return;
+    box.classList.remove('hidden');
+    var msg = e.message || 'desconocido';
+    if (/webgl/i.test(msg)) {
+      box.innerHTML = '<b>No se pudo iniciar el motor 3D</b><br>' +
+        'Tu navegador no ha podido crear un contexto WebGL. Activa la aceleración por hardware ' +
+        'o prueba con Chrome, Edge o Firefox actualizados.';
+    } else {
+      box.textContent = 'Error: ' + msg;
+    }
+  });
+</script>
 </body>
 </html>
-
