@@ -2,10 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Monuments of War · Ancient Empires — RTS 3D Low-Poly</title>
-<meta name="description" content="Prototipo jugable de RTS 3D low-poly: Incas y Mayas, Sacsayhuamán, el Willaq Umu y las pirámides mayas. 100% en el navegador con Three.js.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#05070d">
+<title>Monuments of War · Ancient Empires — RTS 3D Low-Poly</title>
+<meta name="description" content="RTS 3D low-poly para móvil y escritorio: elige Imperio Inca o Civilización Maya, recolecta, construye y vence a la IA.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2305070d'/%3E%3Cpath d='M12 46 L24 20 L32 34 L40 14 L52 46 Z' fill='none' stroke='%237fd8ff' stroke-width='4' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,56 +28,42 @@
         </span>
         <div class="brand-txt">
           <h1>MONUMENTS OF WAR</h1>
-          <p>Ancient Empires · Prototipo RTS 3D</p>
+          <p>Ancient Empires · RTS 3D</p>
         </div>
       </div>
 
       <div class="res-group">
-        <div class="res" title="Oro — lo generan las terrazas agrícolas">
-          <span class="ico oro"></span>
-          <span class="val" id="res-oro">0</span>
-          <label>Oro</label>
+        <div class="res" title="Oro — lo recogen los aldeanos">
+          <span class="ico oro"></span><span class="val" id="res-oro">0</span><label>Oro</label>
         </div>
-        <div class="res" title="Inti — fe solar del Coricancha">
-          <span class="ico inti"></span>
-          <span class="val" id="res-inti">0</span>
-          <label>Inti</label>
+        <div class="res" title="Piedra — la recogen los aldeanos">
+          <span class="ico piedra"></span><span class="val" id="res-piedra">0</span><label>Piedra</label>
         </div>
-        <div class="res" title="Población de tu hueste">
-          <span class="ico pop"></span>
-          <span class="val" id="res-pop">0/20</span>
-          <label>Hueste</label>
+        <div class="res" title="Inti — fe de los templos">
+          <span class="ico inti"></span><span class="val" id="res-inti">0</span><label>Inti</label>
+        </div>
+        <div class="res" title="Hueste / límite">
+          <span class="ico pop"></span><span class="val" id="res-pop">0/20</span><label>Hueste</label>
         </div>
       </div>
 
       <div class="top-actions">
         <div id="wave-chip" class="chip"><span class="dot"></span><span id="wave-info">Oleada 1</span></div>
-        <button class="btn ghost" id="btn-lore" type="button">Lore</button>
-        <button class="btn ghost" id="btn-help" type="button">Cómo jugar</button>
-        <a class="btn donate" id="btn-donate" href="#" target="_blank" rel="noopener noreferrer">
+        <button class="icon-btn" id="btn-fullscreen" type="button" title="Pantalla completa" aria-label="Pantalla completa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+        </button>
+        <button class="btn ghost hide-sm" id="btn-lore" type="button">Lore</button>
+        <button class="btn ghost" id="btn-help" type="button">Ayuda</button>
+        <a class="icon-btn donate" id="btn-donate" href="#" target="_blank" rel="noopener noreferrer" title="Apoyar el desarrollo">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.7-9.3-9.1C1.2 8.2 3.4 4.8 6.9 4.8c2 0 3.5 1.1 4.3 2.3.8-1.2 2.3-2.3 4.3-2.3 3.5 0 5.7 3.4 4.2 7.1C19.5 16.3 12 21 12 21z" fill="currentColor"/></svg>
-          Apoyar el desarrollo
         </a>
       </div>
     </header>
 
-    <section id="sel-panel" class="panel hidden" aria-live="polite">
-      <div class="sel-head">
-        <div class="portrait" id="sel-portrait"></div>
-        <div class="sel-meta">
-          <h3 id="sel-name">—</h3>
-          <p id="sel-kind">—</p>
-          <div class="hpbar"><i id="sel-hp-fill"></i></div>
-          <span class="hpnum" id="sel-hp">0 / 0</span>
-        </div>
-      </div>
-      <div class="sel-actions" id="sel-actions"></div>
-    </section>
-
     <aside id="right-col">
       <div class="panel mini">
         <div class="panel-title">Mapa estratégico</div>
-        <canvas id="minimap" width="230" height="230"></canvas>
+        <canvas id="minimap" width="220" height="220"></canvas>
       </div>
       <div class="panel log">
         <div class="panel-title">Crónica de guerra</div>
@@ -85,18 +73,13 @@
 
     <div id="objective" class="panel">
       <div class="panel-title">Objetivo</div>
-      <p id="objective-txt">Destruye la <b>Pirámide de Kukulcán</b> y conserva el Coricancha.</p>
+      <p>Destruye el <b>centro urbano enemigo</b> y conserva el tuyo.</p>
     </div>
 
-    <footer id="hints">
-      <span><kbd>Clic izq.</kbd> seleccionar</span>
-      <span><kbd>Arrastrar</kbd> caja</span>
-      <span><kbd>Clic der.</kbd> mover / atacar</span>
-      <span><kbd>WASD</kbd> cámara</span>
-      <span><kbd>Rueda</kbd> zoom</span>
-      <span><kbd>Q</kbd><kbd>E</kbd> rotar</span>
-      <span><kbd>Esc</kbd> cancelar</span>
-    </footer>
+    <section id="cmdbar">
+      <div class="cmd-head" id="cmd-info"></div>
+      <div class="cmd-actions" id="cmd-actions"></div>
+    </section>
 
     <div id="toast" class="hidden"></div>
     <div id="errbox" class="hidden"></div>
@@ -109,23 +92,48 @@
     </div>
   </div>
 
-  <div id="intro">
-    <div class="intro-inner">
+  <!-- ===== Selección de facción ===== -->
+  <div id="faction-screen">
+    <div class="fs-inner">
       <div class="intro-kicker">PROTOTIPO JUGABLE · THREE.JS · 100% CLIENT-SIDE</div>
       <h2>MONUMENTS<span>OF WAR</span></h2>
-      <p class="intro-sub">Dos imperios se miran desde el altiplano. La piedra recuerda quién la talló.</p>
-      <div class="factions">
-        <div class="fcard inca">
-          <h4>Incas <em>· Tú</em></h4>
+      <p class="intro-sub">Dos imperios se miran desde el altiplano. Elige a quién sirves.</p>
+
+      <div class="faction-grid">
+        <button class="faction-pick inca" data-faction="inca" type="button">
+          <span class="f-tag">Imperio Inca</span>
+          <h3>Los hijos del Sol</h3>
           <p>Piedra encajada sin mortero, terrazas de altura y la palabra del <b>Willaq Umu</b>.</p>
-        </div>
-        <div class="fcard maya">
-          <h4>Mayas <em>· IA</em></h4>
-          <p>Escalinatas infinitas, jaguares y el cálculo del cielo sobre la piedra caliza.</p>
-        </div>
+          <ul class="f-units">
+            <li><i class="dot inca"></i>Chasqui · economía</li>
+            <li><i class="dot inca"></i>Chakana · infantería</li>
+            <li><i class="dot inca"></i>Hondero · distancia</li>
+            <li><i class="dot inca"></i>Willaq Umu · élite</li>
+          </ul>
+        </button>
+
+        <button class="faction-pick maya" data-faction="maya" type="button">
+          <span class="f-tag">Civilización Maya</span>
+          <h3>Los contadores del cielo</h3>
+          <p>Escalinatas infinitas, jaguares y el cálculo de Venus sobre piedra caliza.</p>
+          <ul class="f-units">
+            <li><i class="dot maya"></i>Aldeano · economía</li>
+            <li><i class="dot maya"></i>Jaguar · infantería</li>
+            <li><i class="dot maya"></i>Arquero de obsidiana</li>
+            <li><i class="dot maya"></i>Chamán de Chichén</li>
+          </ul>
+        </button>
       </div>
-      <button class="btn primary big" id="btn-start" type="button">Iniciar campaña</button>
-      <p class="intro-foot">Sin servidores · sin anuncios · sin afiliados</p>
+
+      <button class="btn primary big" id="btn-start" type="button">Comenzar campaña</button>
+
+      <div class="fs-foot">
+        <a class="link" id="btn-donate-2" href="#" target="_blank" rel="noopener noreferrer">Apoyar con PayPal</a>
+        <span class="sep">·</span>
+        <button class="link" id="btn-help-2" type="button">Cómo jugar</button>
+        <span class="sep">·</span>
+        <span>La facción no elegida será la IA</span>
+      </div>
     </div>
   </div>
 
@@ -141,7 +149,6 @@
 </script>
 <script type="module" src="js/main.js"></script>
 <script>
-  // Red de seguridad: si algo falla, lo mostramos en pantalla en vez de dejar un canvas negro.
   window.addEventListener('error', function (e) {
     var box = document.getElementById('errbox');
     if (!box) return;
@@ -150,7 +157,7 @@
     if (/webgl/i.test(msg)) {
       box.innerHTML = '<b>No se pudo iniciar el motor 3D</b><br>' +
         'Tu navegador no ha podido crear un contexto WebGL. Activa la aceleración por hardware ' +
-        'o prueba con Chrome, Edge o Firefox actualizados.';
+        'o prueba con Chrome, Edge, Safari o Firefox actualizados.';
     } else {
       box.textContent = 'Error: ' + msg;
     }

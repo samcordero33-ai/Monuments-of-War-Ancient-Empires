@@ -10,19 +10,27 @@ export const CFG = {
   WATER: -0.65,      // altura del agua
 
   // --- Cámara ---
-  CAM_MIN: 26,
-  CAM_MAX: 115,
-  CAM_START: 62,
-  CAM_PAN: 34,       // velocidad de paneo
+  CAM_MIN: 24,
+  CAM_MAX: 112,
+  CAM_START: 60,
+  CAM_PAN: 34,       // velocidad de paneo (teclado)
 
   // --- Partida ---
-  POP_CAP: 20,
-  START_ORO: 320,
-  START_INTI: 120,
-  WAVE_FIRST: 55,    // segundos hasta la primera oleada
-  WAVE_EVERY: 34,    // segundos entre oleadas
-  ENEMY_MAX: 22,     // tope de unidades enemigas simultáneas
+  POP_CAP: 20,       // hueste inicial
+  POP_STEP: 10,      // por ampliación del centro urbano
+  POP_MAX: 40,
+  POP_UP_COST: { oro: 220, piedra: 120 },
+  START: { oro: 420, piedra: 260, inti: 80 },
+
+  WAVE_FIRST: 85,    // segundos hasta la primera oleada
+  WAVE_EVERY: 38,    // segundos entre oleadas
+  ENEMY_MAX: 18,     // tope de unidades enemigas simultáneas
   MAX_DPR: 1.75,
+
+  // --- Recolección ---
+  GATHER_RATE: 7,    // recurso por segundo y aldeano
+  CARRY_CAP: 20,     // carga antes de volver al centro urbano
+  NODE_AMOUNT: 900,  // recursos por yacimiento
 
   // --- Monetización directa (EDITA ESTO con tu enlace real) ---
   PAYPAL_URL: 'https://www.paypal.com/paypalme/TU_USUARIO',
@@ -45,8 +53,28 @@ export const COL = {
   enemy: 0x9fe8d8,
 };
 
-/* Colores por facción (acento de tela / detalles) */
+/* Colores y etiquetas por facción */
 export const FACTION = {
-  inca: { accent: 0x4ea8ff, cloth: 0x1e4585, trim: 0x7fd8ff, ring: 0x7fd8ff },
-  maya: { accent: 0x9fe8d8, cloth: 0x2e3d48, trim: 0xdfe9f5, ring: 0xbfeede },
+  inca: {
+    name: 'Imperio Inca',
+    short: 'Incas',
+    accent: 0x4ea8ff,
+    cloth: 0x1e4585,
+    trim: 0x7fd8ff,
+    ring: 0x7fd8ff,
+    css: '#7fd8ff',
+    desc: 'Piedra encajada sin mortero, terrazas de altura y la palabra del Willaq Umu.',
+  },
+  maya: {
+    name: 'Civilización Maya',
+    short: 'Mayas',
+    accent: 0x9fe8d8,
+    cloth: 0x2e3d48,
+    trim: 0xdfe9f5,
+    ring: 0xbfeede,
+    css: '#9fe8d8',
+    desc: 'Escalinatas infinitas, jaguares y el cálculo del cielo sobre piedra caliza.',
+  },
 };
+
+export const OTHER = { inca: 'maya', maya: 'inca' };

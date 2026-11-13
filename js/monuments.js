@@ -133,24 +133,26 @@ export function createCoricancha() {
   g.add(box(6.4, 0.5, 0.7, sMat, 0, 3.9, 2.2));
 
   // techo a dos aguas
-  const roof = new THREE.Mesh(new THREE.ConeGeometry(4.5, 1.7, 4), dMat);
-  roof.position.set(0, 4.55, -0.6);
+  // techo a dos aguas, más estrecho que la cella para que se vean los muros
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(3.5, 1.9, 4), dMat);
+  roof.position.set(0, 4.75, -0.9);
   roof.rotation.y = Math.PI / 4;
-  roof.scale.set(1.18, 1, 1.06);
+  roof.scale.set(1.1, 1, 0.95);
   roof.castShadow = true;
   g.add(roof);
+  // remate del techo
+  const ridge = new THREE.Mesh(new THREE.BoxGeometry(5.0, 0.22, 0.22), sMat);
+  ridge.position.set(0, 5.75, -0.9);
+  ridge.rotation.y = Math.PI / 4;
+  g.add(ridge);
+  // pretil delantero
+  g.add(box(6.6, 0.35, 0.4, mMat, 0, 4.1, 2.2));
 
   // disco solar (Inti) en el muro curvo
-  const sun = new THREE.Mesh(new THREE.CylinderGeometry(1.05, 1.05, 0.22, 16), glow);
+  const sun = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.22, 16), glow);
   sun.rotation.x = Math.PI / 2;
-  sun.position.set(0, 3.1, -4.0);
+  sun.position.set(0, 3.0, -3.35);
   g.add(sun);
-  const halo = new THREE.Mesh(
-    new THREE.RingGeometry(1.15, 1.55, 24),
-    new THREE.MeshBasicMaterial({ color: COL.celeste, transparent: true, opacity: 0.42, side: THREE.DoubleSide })
-  );
-  halo.position.set(0, 3.1, -3.86);
-  g.add(halo);
 
   // anillo de luz en el suelo
   const ring = new THREE.Mesh(
@@ -345,5 +347,195 @@ export function createRallyMarker(color = COL.celeste) {
   );
   ring.rotation.x = -Math.PI / 2;
   g.add(ring);
+  return g;
+}
+
+/* ------------------------------------------------------------
+   TEMPLO DEL SOL — edificio especial inca (más pequeño)
+   ------------------------------------------------------------ */
+export function createSunTemple() {
+  const g = new THREE.Group();
+  const sMat = stone(), mMat = stoneMid(), dMat = stoneDark();
+  const glow = M(COL.celeste, { emissive: COL.celeste, ei: 1.5, rough: 0.4, metal: 0.2 });
+
+  g.add(box(8, 0.7, 7, dMat, 0, 0.35, 0));
+  g.add(box(7, 0.5, 6, sMat, 0, 0.95, 0));
+
+  // cella con columnas
+  for (let i = 0; i < 4; i++) {
+    g.add(box(0.42, 2.4, 0.42, mMat, -2.1 + i * 1.4, 2.4, 1.9));
+  }
+  g.add(box(5.4, 0.4, 0.6, sMat, 0, 3.75, 1.9));
+  g.add(box(5.6, 2.6, 3.6, sMat, 0, 2.5, -0.9));
+
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(3.9, 1.5, 4), dMat);
+  roof.position.set(0, 4.6, -0.6);
+  roof.rotation.y = Math.PI / 4;
+  roof.scale.set(1.15, 1, 1);
+  roof.castShadow = true;
+  g.add(roof);
+
+  // disco solar y halo
+  const sun = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 0.2, 14), glow);
+  sun.rotation.x = Math.PI / 2;
+  sun.position.set(0, 2.9, 1.35);
+  g.add(sun);
+  const halo = new THREE.Mesh(
+    new THREE.RingGeometry(0.95, 1.3, 20),
+    new THREE.MeshBasicMaterial({ color: COL.celeste, transparent: true, opacity: 0.4, side: THREE.DoubleSide })
+  );
+  halo.position.set(0, 2.9, 1.5);
+  g.add(halo);
+
+  g.userData.radius = 4.8;
+  return g;
+}
+
+/* ------------------------------------------------------------
+   TORRE DE VIGILANCIA INCA
+   ------------------------------------------------------------ */
+export function createWatchtowerInca() {
+  const g = new THREE.Group();
+  const sMat = stone(), mMat = stoneMid(), dMat = stoneDark();
+
+  g.add(box(4.4, 0.6, 4.4, dMat, 0, 0.3, 0));
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.9, 4.6, 8), sMat);
+  body.position.y = 2.9;
+  body.castShadow = true; body.receiveShadow = true;
+  g.add(body);
+
+  // plataforma superior
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 2.0, 0.4, 8), mMat);
+  top.position.y = 5.35;
+  top.castShadow = true;
+  g.add(top);
+
+  // almenas
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    g.add(box(0.5, 0.55, 0.32, sMat, Math.cos(a) * 1.72, 5.8, Math.sin(a) * 1.72, -a));
+  }
+  // techo cónico
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(1.9, 1.3, 8), dMat);
+  roof.position.y = 6.9;
+  roof.castShadow = true;
+  g.add(roof);
+
+  g.userData.radius = 2.6;
+  return g;
+}
+
+/* ------------------------------------------------------------
+   EL CARACOL — observatorio maya (torre circular)
+   ------------------------------------------------------------ */
+export function createObservatory() {
+  const g = new THREE.Group();
+  const aMat = lime(), bMat = M(0xbfcbd9, { rough: 0.92 }), dMat = stoneDark();
+
+  g.add(box(6.4, 0.7, 6.4, dMat, 0, 0.35, 0));
+  const drum = new THREE.Mesh(new THREE.CylinderGeometry(2.3, 2.5, 4.2, 14), aMat);
+  drum.position.y = 2.8;
+  drum.castShadow = true; drum.receiveShadow = true;
+  g.add(drum);
+
+  // escalera en espiral (aprox.)
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * Math.PI * 1.9;
+    const y = 0.9 + i * 0.34;
+    const r = 2.55;
+    g.add(box(1.1, 0.16, 0.7, bMat, Math.cos(a) * r, y, Math.sin(a) * r, -a));
+  }
+
+  // cúpula superior
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(2.35, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), bMat);
+  dome.position.y = 4.9;
+  dome.castShadow = true;
+  g.add(dome);
+
+  // ventanas de observación
+  [-0.9, 0.4, 1.7].forEach((a, i) => {
+    const w = box(0.55, 0.8, 0.3, M(0x05070d, { rough: 1 }), Math.cos(a) * 2.3, 4.0 + i * 0.1, Math.sin(a) * 2.3, -a);
+    g.add(w);
+  });
+
+  // remate celeste
+  const cap = new THREE.Mesh(new THREE.ConeGeometry(0.4, 1.1, 6), M(COL.celeste, { emissive: COL.celeste, ei: 1.3 }));
+  cap.position.y = 7.3;
+  g.add(cap);
+
+  g.userData.radius = 4.2;
+  return g;
+}
+
+/* ------------------------------------------------------------
+   ATALAYA DE PIEDRA MAYA
+   ------------------------------------------------------------ */
+export function createAtalaya() {
+  const g = new THREE.Group();
+  const aMat = lime(), bMat = M(0xbfcbd9, { rough: 0.92 }), dMat = stoneDark();
+
+  g.add(box(4.6, 0.5, 4.6, dMat, 0, 0.25, 0));
+  g.add(box(3.8, 1.5, 3.8, aMat, 0, 1.25, 0));
+  g.add(box(3.0, 1.5, 3.0, bMat, 0, 2.75, 0));
+  g.add(box(2.4, 1.5, 2.4, aMat, 0, 4.25, 0));
+  g.add(box(3.0, 0.35, 3.0, dMat, 0, 5.15, 0));
+
+  // almenas
+  for (let i = 0; i < 4; i++) {
+    const a = (i / 4) * Math.PI * 2;
+    g.add(box(0.55, 0.6, 0.4, bMat, Math.cos(a) * 1.2, 5.6, Math.sin(a) * 1.2, -a));
+  }
+  // escalinata
+  for (let s = 0; s < 6; s++) {
+    g.add(box(1.1, 0.32, 0.5, bMat, 0, 0.5 + s * 0.5, 2.1 - s * 0.28));
+  }
+
+  g.userData.radius = 2.8;
+  return g;
+}
+
+/* ------------------------------------------------------------
+   NODOS DE RECURSOS
+   ------------------------------------------------------------ */
+export function createGoldNode() {
+  const g = new THREE.Group();
+  const rock = M(0x5c6a7c, { rough: 1 });
+  const gold = M(0xd9a93a, { rough: 0.35, metal: 0.55, emissive: 0x6b4a0a, ei: 0.5 });
+
+  const base = new THREE.Mesh(new THREE.IcosahedronGeometry(1.9, 0), rock);
+  base.position.y = 0.7;
+  base.scale.set(1, 0.62, 1);
+  base.castShadow = true; base.receiveShadow = true;
+  g.add(base);
+
+  for (let i = 0; i < 7; i++) {
+    const a = (i / 7) * Math.PI * 2 + 0.4;
+    const r = 0.5 + Math.random() * 0.9;
+    const c = new THREE.Mesh(new THREE.OctahedronGeometry(0.32 + Math.random() * 0.22, 0), gold);
+    c.position.set(Math.cos(a) * r, 1.0 + Math.random() * 0.5, Math.sin(a) * r);
+    c.rotation.set(Math.random(), Math.random(), Math.random());
+    c.castShadow = true;
+    g.add(c);
+  }
+  g.userData.radius = 2.2;
+  return g;
+}
+
+export function createStoneNode() {
+  const g = new THREE.Group();
+  const a = M(0x7d8a9c, { rough: 1 });
+  const b = M(0x66707f, { rough: 1 });
+
+  for (let i = 0; i < 9; i++) {
+    const s = 0.5 + Math.random() * 0.6;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(s, s * 0.8, s), i % 2 ? a : b);
+    const ang = Math.random() * Math.PI * 2;
+    const r = Math.random() * 1.4;
+    m.position.set(Math.cos(ang) * r, 0.3 + Math.random() * 0.7, Math.sin(ang) * r);
+    m.rotation.set(Math.random() * 0.4, Math.random() * 3, Math.random() * 0.4);
+    m.castShadow = true; m.receiveShadow = true;
+    g.add(m);
+  }
+  g.userData.radius = 2.2;
   return g;
 }
