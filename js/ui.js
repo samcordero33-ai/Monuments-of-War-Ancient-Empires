@@ -65,6 +65,10 @@ export class UI {
 
   /* ================= eventos comunes ================= */
   _bindCommon() {
+    // el enlace de donación debe estar activo desde el primer segundo
+    this.el.donate.href = CFG.PAYPAL_URL;
+    this.el.donate.title = CFG.PAYPAL_LABEL;
+
     document.getElementById('modal-x').addEventListener('click', () => this.closeModal());
     this.el.modal.addEventListener('click', (e) => { if (e.target === this.el.modal) this.closeModal(); });
     document.getElementById('btn-lore').addEventListener('click', () => this.openModal('lore'));
